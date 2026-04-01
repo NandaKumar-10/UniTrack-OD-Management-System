@@ -1,55 +1,99 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const AdminDashboard = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCreateFaculty = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/admin/faculty', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create faculty account');
+      }
+
+      setMessage({ type: 'success', text: 'Faculty account created successfully!' });
+      setFormData({ name: '', email: '', password: '' });
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="container fade-in">
-      <h1 className="page-title">Department Admin</h1>
-      <p className="page-subtitle">Manage department events and generate monthly activity summaries.</p>
+      <h1 className="page-title">Admin Dashboard</h1>
+      <p className="page-subtitle">Manage system users and view high-level summaries.</p>
       
       <div className="grid-2" style={{ marginBottom: '2rem' }}>
         <div className="card">
-          <h2 className="card-title">Publish Event News</h2>
-          <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h2 className="card-title">Create Faculty Credentials</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+            Generate access credentials for new department faculty members.
+          </p>
+
+          {message.text && (
+            <div style={{
+              padding: '0.75rem',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: '1rem',
+              backgroundColor: message.type === 'error' ? '#fee2e2' : '#d1fae5',
+              color: message.type === 'error' ? '#991b1b' : '#065f46'
+            }}>
+              {message.text}
+            </div>
+          )}
+
+          <form onSubmit={handleCreateFaculty} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="form-group">
-              <label className="form-label">Event Title</label>
-              <input type="text" className="form-input" placeholder="e.g. Annual Hackathon" />
+              <label className="form-label">Full Name</label>
+              <input type="text" name="name" value={formData.name} onChange={handleChange} required className="form-input" placeholder="e.g. Dr. Jane Smith" />
             </div>
             <div className="form-group">
-              <label className="form-label">Event Type</label>
-              <select className="form-input">
-                <option>Internal Department Event</option>
-                <option>External Inter-College Event</option>
-              </select>
+              <label className="form-label">Email Address</label>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} required className="form-input" placeholder="faculty@college.edu" />
             </div>
             <div className="form-group">
-              <label className="form-label">Description</label>
-              <textarea className="form-input" rows="3" placeholder="Event details..."></textarea>
+              <label className="form-label">Temporary Password</label>
+              <input type="text" name="password" value={formData.password} onChange={handleChange} required className="form-input" placeholder="Set a secure password" />
             </div>
-            <button type="button" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>Publish Event</button>
+            <button type="submit" disabled={loading} className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
+              {loading ? 'Creating...' : 'Create Account'}
+            </button>
           </form>
         </div>
-        
-        <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-          <h2 className="card-title">Monthly Activity Summary Module</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-            Automatically collect data from events and student activities to generate a structured department highlights report.
-          </p>
-          
-          <div style={{ background: 'var(--bg-color)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', marginBottom: '1.5rem', flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <span style={{ fontWeight: 600 }}>Period: <span style={{ color: 'var(--primary)' }}>October 2026</span></span>
-              <span className="badge badge-info">Ready to Generate</span>
-            </div>
-            <ul style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginLeft: '1.5rem', marginBottom: '1rem' }}>
-              <li>14 Events Conducted</li>
-              <li>45 Student Achievements Logged</li>
-              <li>120 ODs Approved</li>
-            </ul>
-          </div>
-          
-          <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', background: 'var(--secondary)' }}>
-            Generate Executive Summary
-          </button>
+
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', backgroundColor: 'var(--primary-light)', border: 'none' }}>
+           <h2 className="card-title" style={{ color: 'var(--primary)' }}>System Overview</h2>
+           <p style={{ color: 'var(--primary-hover)', marginTop: '0.5rem' }}>
+             Welcome to the UniTrack administrator panel. From here you can:
+           </p>
+           <ul style={{ color: 'var(--primary-hover)', marginTop: '1rem', marginLeft: '1.5rem', lineHeight: '1.8' }}>
+             <li>Create and distribute credentials for faculty members.</li>
+             <li>Publish upcoming department and college events to the student portal.</li>
+             <li>Manage (Edit/Delete) existing events.</li>
+             <li>Generate dynamic, real-time PDF executive summaries of college activities.</li>
+           </ul>
         </div>
       </div>
     </div>

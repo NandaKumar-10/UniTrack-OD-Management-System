@@ -293,6 +293,126 @@ app.get('/api/faculty/students', authenticateToken, async (req, res) => {
   }
 });
 
+// --- Admin API Routes ---
+
+const requireAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+  next();
+};
+
+app.post('/api/admin/faculty', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ message: 'Name, email, and password are required' });
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(409).json({ message: 'Email already exists' });
+
+    const newFaculty = await User.create({
+      name,
+      email,
+      password,
+      role: 'faculty'
+    });
+
+    const userData = newFaculty.toObject();
+    delete userData.password;
+    
+    res.status(201).json(userData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/api/admin/events', authenticateToken, async (req, res) => {
+  try {
+    // Both admin and students/faculty might need events, but this admin route can be used to manage them.
+    // For now, allow admin to manage.
+    const events = await Event.find().sort({ date: -1 });
+    res.json(events);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post('/api/admin/events', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { title, type, description, date } = req.body;
+    if (!title || !type || !description || !date) return res.status(400).json({ message: 'Missing fields' });
+
+    const newEvent = await Event.create({
+      title,
+      type,
+      description,
+      date
+    });
+    
+    res.status(201).json(newEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.put('/api/admin/events/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { title, type, description, date } = req.body;
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      { title, type, description, date },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedEvent) return res.status(404).json({ message: 'Event not found' });
+    res.json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.delete('/api/admin/events/:id', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const deletedEvent = await Event.findByIdAndDelete(req.params.id);
+    if (!deletedEvent) return res.status(404).json({ message: 'Event not found' });
+    res.json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get('/api/admin/summary', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+    const eventsConducted = await Event.countDocuments({
+      date: { $gte: startOfMonth, $lte: endOfMonth }
+    });
+
+    const studentAchievements = await Achievement.countDocuments({
+      date: { $gte: startOfMonth, $lte: endOfMonth }
+    });
+
+    const odsApproved = await OD.countDocuments({
+      status: 'Approved',
+      date: { $gte: startOfMonth, $lte: endOfMonth }
+    });
+
+    const monthName = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    res.json({
+      period: monthName,
+      eventsCount: eventsConducted,
+      achievementsCount: studentAchievements,
+      odsApprovedCount: odsApproved
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

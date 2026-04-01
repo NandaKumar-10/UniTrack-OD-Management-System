@@ -10,6 +10,8 @@ import FacultyDashboard from './pages/faculty/FacultyDashboard';
 import FacultyApprovals from './pages/faculty/FacultyApprovals';
 import StudentTracking from './pages/faculty/StudentTracking';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminEvents from './pages/admin/AdminEvents';
+import AdminReports from './pages/admin/AdminReports';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
         
         <Route path="/admin" element={<Layout role="admin" />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="events" element={<AdminEvents />} />
+          <Route path="reports" element={<AdminReports />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
