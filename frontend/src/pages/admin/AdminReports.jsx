@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const AdminReports = () => {
   const [summaryData, setSummaryData] = useState(null);
@@ -47,7 +47,7 @@ const AdminReports = () => {
     doc.text(`Generated on: ${currentDate}`, 14, 40);
 
     // Table
-    doc.autoTable({
+    autoTable(doc, {
       startY: 50,
       head: [['Metric', 'Count']],
       body: [

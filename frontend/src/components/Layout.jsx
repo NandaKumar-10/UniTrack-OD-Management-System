@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Trophy, Users, FileText, Settings, LogOut, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, Calendar, Trophy, Users, FileText, LogOut, GraduationCap } from 'lucide-react';
 
 const Layout = ({ role }) => {
   const navigate = useNavigate();
@@ -24,12 +24,11 @@ const Layout = ({ role }) => {
       { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
       { path: '/admin/events', icon: <Calendar size={20} />, label: 'Event Publishing' },
       { path: '/admin/reports', icon: <FileText size={20} />, label: 'Monthly Summary' },
-      { path: '/admin/settings', icon: <Settings size={20} />, label: 'Settings' },
     ]
   };
 
   const navItems = menuConfig[role] || [];
-  
+
   const roleDisplay = role.charAt(0).toUpperCase() + role.slice(1);
 
   return (
