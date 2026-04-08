@@ -12,6 +12,7 @@ import StudentTracking from './pages/faculty/StudentTracking';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminEvents from './pages/admin/AdminEvents';
 import AdminReports from './pages/admin/AdminReports';
+import AdminStudents from './pages/admin/AdminStudents';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="events" element={<AdminEvents />} />
           <Route path="reports" element={<AdminReports />} />
+          <Route path="students" element={<AdminStudents />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

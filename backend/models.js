@@ -4,21 +4,38 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['student', 'faculty', 'admin'], default: 'student' }
+  rollNumber: { type: String },
+  role: { type: String, enum: ['student', 'faculty', 'admin'], default: 'student' },
+  mentorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
 const odSchema = new mongoose.Schema({
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  mentorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   studentName: { type: String, required: true },
+  studentRollNumber: { type: String },
   eventName: { type: String, required: true },
-  date: { type: Date, required: true },
-  reason: { type: String, required: true },
+  
+  // Legacy fields
+  date: { type: Date },
+  reason: { type: String },
+  
+  // New detailed fields
+  startDate: { type: Date },
+  startTime: { type: String },
+  endDate: { type: Date },
+  endTime: { type: String },
+  description: { type: String },
+  venue: { type: String },
+  proofLink: { type: String },
+
   status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' }
 }, { timestamps: true });
 
 const achievementSchema = new mongoose.Schema({
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   studentName: { type: String, required: true },
+  studentRollNumber: { type: String },
   eventName: { type: String, required: true },
   rank: { type: String, required: true },
   date: { type: Date, required: true },

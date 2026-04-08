@@ -24,6 +24,7 @@ const Layout = ({ role }) => {
       { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
       { path: '/admin/events', icon: <Calendar size={20} />, label: 'Event Publishing' },
       { path: '/admin/reports', icon: <FileText size={20} />, label: 'Monthly Summary' },
+      { path: '/admin/students', icon: <Users size={20} />, label: 'Assign Mentors' },
     ]
   };
 

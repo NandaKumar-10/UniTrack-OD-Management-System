@@ -58,8 +58,8 @@ const FacultyDashboard = () => {
           <div style={{ fontSize: '2.5rem', fontWeight: 700, color: '#92400E' }}>{data.stats.pendingApprovals}</div>
         </div>
         <div className="card">
-          <div className="card-title">Students on OD Today</div>
-          <div style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--primary)' }}>{data.stats.studentsOnOdToday}</div>
+          <div className="card-title">Total ODs Approved</div>
+          <div style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--primary)' }}>{data.stats.totalOdsApproved}</div>
         </div>
         <div className="card">
           <div className="card-title">Total Achievements (Month)</div>
@@ -75,21 +75,42 @@ const FacultyDashboard = () => {
           <table className="data-table">
              <thead>
                <tr>
-                 <th>Date</th>
+                 <th>Date & Time</th>
                  <th>Student</th>
                  <th>Event Details</th>
-                 <th>Reason</th>
+                 <th>Description</th>
+                 <th>Proof</th>
                  <th>Actions</th>
                </tr>
              </thead>
              <tbody>
                {data.pendingOds.map(od => (
                  <tr key={od._id}>
-                   <td>{new Date(od.date).toLocaleDateString()}</td>
+                   <td>
+                    {od.startDate ? (
+                      <div style={{ fontSize: '0.85rem' }}>
+                        <div>{new Date(od.startDate).toLocaleDateString()} <span style={{ color: 'var(--text-muted)' }}>{od.startTime}</span></div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: '2px 0' }}>to</div>
+                        <div>{new Date(od.endDate).toLocaleDateString()} <span style={{ color: 'var(--text-muted)' }}>{od.endTime}</span></div>
+                      </div>
+                    ) : ( 
+                      new Date(od.date).toLocaleDateString()
+                    )}
+                   </td>
                    <td style={{ fontWeight: 500 }}>{od.studentName}</td>
-                   <td>{od.eventName}</td>
-                   <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={od.reason}>
-                     {od.reason}
+                   <td>
+                     <div style={{ fontWeight: 500 }}>{od.eventName}</div>
+                     {od.venue && <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>📍 {od.venue}</div>}
+                   </td>
+                   <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={od.description || od.reason}>
+                     {od.description || od.reason}
+                   </td>
+                   <td>
+                     {od.proofLink ? (
+                       <a href={od.proofLink} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline', fontSize: '0.85rem' }}>View Proof</a>
+                     ) : (
+                       <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>N/A</span>
+                     )}
                    </td>
                    <td>
                      <div style={{ display: 'flex', gap: '0.5rem' }}>

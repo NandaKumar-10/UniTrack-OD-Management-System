@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap } from 'lucide-react';
 
@@ -7,6 +7,7 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rollNumber, setRollNumber] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +22,7 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, rollNumber }),
       });
 
       const data = await response.json();
@@ -71,6 +72,17 @@ const Register = () => {
             />
           </div>
           <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Roll Number</label>
+            <input 
+              type="text" 
+              value={rollNumber}
+              onChange={(e) => setRollNumber(e.target.value)}
+              required
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+              placeholder="e.g. 21CS001"
+            />
+          </div>
+          <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Student Email</label>
             <input 
               type="email" 
@@ -93,6 +105,7 @@ const Register = () => {
             />
           </div>
           
+
           <button 
             type="submit" 
             className="btn btn-primary" 
